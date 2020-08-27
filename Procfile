@@ -1,1 +1,1 @@
-web: gunicorn ecommerce_template.wsgi
+web: gunicorn imdb.wsgi
