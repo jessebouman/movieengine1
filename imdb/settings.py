@@ -25,7 +25,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'imbdactorapp.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', 'imbdactorsearch.herokuapp.com']
 
 
 # Application definition
