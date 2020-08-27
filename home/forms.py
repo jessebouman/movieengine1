@@ -1,42 +1,25 @@
 # -*- coding: utf-8 -*-
 from django import forms
 
-class Contact(forms.Form):
-    first_name = forms.CharField(
+class ActorSearch(forms.Form):
+    first_actor = forms.CharField(
             widget=forms.TextInput(
                     attrs={
                             'class': 'form-control',
-                            'placeholder': 'First'
+                            'placeholder': 'First actor'
                             }
                     ),
-            label='Name',
+            label='',
             required=True
             )
 
-    last_name = forms.CharField(
+    second_actor = forms.CharField(
             widget=forms.TextInput(
                     attrs={
                             'class': 'form-control',
-                            'placeholder': 'Last'
+                            'placeholder': 'Second actor'
                             }
                     ),
             label='',
             required=False
             )
-
-    email = forms.CharField(
-            widget=forms.TextInput(
-                    attrs={
-                            'class': 'form-control',
-                            'type': 'email',
-                            }
-                    ),
-            label=f'Email',
-            required=True)
-
-    message = forms.CharField(
-            widget=forms.Textarea(
-                    attrs={'class': 'form-control'}
-                    ),
-            label='Message',
-            required=True)

@@ -1,7 +1,7 @@
 # MY STUFF
 secrets.txt
 docs/
-static/
+/static/
 
 # SQLite
 *.sqlite3

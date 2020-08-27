@@ -2,136 +2,215 @@
 """
 Created on Wed Aug 12 12:17:52 2020
 
-Script to handle searching, sorting, and filtering of ecommerce items
+Script to handle actor search
 
 @author: Spencer Ferguson-Dryden
 """
-from django import forms
+import os
+import requests
 
-def handle_search(form, **kwargs):
+IMDB_KEY = os.environ.get('IMDB_KEY')
+
+def handle_search(*actors):
     """
-    Handles search/sort/filter input.
-
     Parameters
     ----------
-    form : dict
-        TThe cleaned data from the search/sort/filter form
+    actors : list
+        A list of actors to lookup
 
     Returns
     -------
-    where
-        a string containing the WHERE clause of the SQL query
-    order
-        a string containing the ORDER BY clause of the SQL query
+    movies : list, None
+        A list of dictionaries with the details of movie credits shared by the two actors
+        None if one of the actors couldn't be found
+    actor_details : list
+        A list of dictionaries with the actor details
     """
 
-    # Construct WHERE clause from search
-    search = f"({form['search_by']} ILIKE '%{form['search']}%')" if form['search'] else ''
+    # Get ID for each actor
+    actor_ids = list(map(lambda a : get_actor_id(a), actors))
 
-    # Construct WHERE clause from _filter
-    lo = str(float(form['price_filer_lo'])) if form['price_filter_lo'] else None
-    hi = str(float(form['price_filter_hi'])) if form['price_filter_hi'] else None
-    if lo and hi:
-        price_filter = f'(price BETWEEN {lo} AND {hi})'
-    elif lo:
-        price_filter = f'(price >= {lo})'
-    elif hi:
-        price_filter = f'(price <= {hi})'
-    else:
-        price_filter = ''
+    # Get profile details for each actor
+    actor_details = list(map(lambda a_id : get_actor_details(a_id), actor_ids))
 
-    # Add for sale/out of stock result option to query
-    if price_filter and form['for_sale']:
-        price_filter += ' OR (price = -1)'
-    elif price_filter and not form['for_sale']:
-        price_filter += ' AND (price != -1)'
+    # Get acting roles for each actor
+    actor_credits = list(map(lambda a_id : get_actor_credits(a_id), actor_ids))
 
-    if search and price_filter:
-        # The user submits a search and a filter query
-        where = search + ' AND ' + price_filter
-    elif search or price_filter:
-        # The user submits either a search or a filter query (exclusive)
-        where = search + price_filter
-    else:
-        # The user submits no search or filter query, only an ORDER BY query
-        where = None
+    # If either actor_id is None or either actor_credits is None, then return (no result, but display names/photos)
+    if None in actor_ids or None in actor_credits:
+        return None, actor_details
 
-    # Construct ORDER BY clause
-    order_by = form['sort']
-    order_dir = form['sort_order']
-    order = f'ORDER BY {order_by} {order_dir}'
+    # Find any matches between the sets of movies
+    actor_movie_sets = [set((m['title'], m['year']) for m in c) for c in actor_credits]
+    shared_movies = set.intersection(*actor_movie_sets)
 
-    return where, order
+    # If there are no shared movies, return empty list and actor details
+    if not shared_movies:
+        return [], actor_details
 
-class Search(forms.Form):
+    # Build result list
+    movies = []
+    for title, year in shared_movies:
+        tmp = {
+                'title': title,
+                'year': year,
+                }
+
+        # find character names for the shared movie
+        characters = [find_character(title, year, a_credits) for a_credits in actor_credits]
+        tmp['characters'] = characters
+
+        movies.append(tmp)
+
+    return movies, actor_details
+
+def get_actor_id(actor):
     """
-    SEARCH BY: name, description
-    FILTER BY: price (from/to)
-    SORT BY: name (A-Z, Z-A), id (new-old, old-new), price (low-hi, hi-low)
+    Returns the ID of the requested actor.
+    If multiple actors with the same name exist, choose the first actor result # BUG
+    If no actor exists, return None
+
+    Parameters
+    ----------
+    actor : str
+        A actor's name
+
+    Returns
+    -------
+    actor_id : int, None
+        The IMDB API ID of the actor or None if the actor does not exist in the IMDB API
     """
-    search = forms.CharField(
-            widget=forms.TextInput(
-                    attrs={
-                            'class': 'form-control w-auto',
-                            'placeholder': 'Search...'
-                            }
-                    ),
-            required=False
-            )
-    search_by = forms.ChoiceField(
-            widget=forms.Select(
-                    attrs={
-                            'class': 'form-control w-75',
-                            'value': 'name'
-                            },
-                    ),
-            choices=[('name', 'Name'), ('description', 'Description')],
-            required=False
-            )
 
-    price_filter_lo = forms.DecimalField(
-            widget=forms.NumberInput(
-                    attrs={
-                            'class': 'form-control',
-                            'placeholder': 'From'
-                            }
-                    ),
-            label='Price',
-            required=False
-            )
-    price_filter_hi = forms.DecimalField(
-            widget=forms.NumberInput(
-                    attrs={
-                            'class': 'form-control',
-                            'placeholder': 'To'
-                            }
-                    ),
-            required=False
-            )
-    for_sale = forms.BooleanField(
-            widget=forms.CheckboxInput(
-                    attrs={'class': 'form-check-input'}
-                    ),
-            label='Include items not for sale?',
-            initial=True,
-            required=False
-            )
+    # Construct and execute API query
+    url = 'https://api.themoviedb.org/3/search/person'
+    params = {
+            'api_key': IMDB_KEY,
+            'query': actor,
+            'include_adult': 'false'
+            }
+    response = requests.get(url, params=params)
 
-    sort = forms.ChoiceField(
-            widget=forms.Select(
-                    attrs={
-                            'class': 'form-control',
-                            'value': 'date'
-                            }
-                    ),
-            choices=[('id', 'Date'), ('name', 'Name'), ('price', 'Price')],
-            required=False
-            )
-    sort_order = forms.ChoiceField(
-            widget=forms.RadioSelect(
-                    attrs={'class': 'form-check-input'}
-                    ),
-            choices=[('DESC', 'Descending'), ('ASC', 'Ascending')],
-            initial='DESC',
-            required=False
-            )
+    # Convert to dictionary
+    try:
+        data = response.json()
+    except:
+        return None # Invalid IMDB response
+
+    # Check if the actor exists
+    if not data['results']:
+        return  None
+
+    # Find first actor in results
+    actor_id = None
+    for entry in data['results']:
+        if entry['known_for_department'] == 'Acting':
+            actor_id = entry['id']
+            break
+
+    return actor_id
+
+def get_actor_details(actor_id):
+    """
+    Returns the details of the requested actor.
+
+    Parameters
+    ----------
+    actor_id : int, None
+        The IMDB ID of an actor
+
+    Returns
+    -------
+    details : dict, None
+        the IMDB API ID of the actor or None if the actor_id is None
+    """
+
+    # Return None if the actor could not be found
+    if actor_id is None:
+        return None
+
+    # Construct and execute API query
+    url = f'https://api.themoviedb.org/3/person/{actor_id}'
+    response = requests.get(url, params={'api_key': IMDB_KEY})
+
+    # Convert to dictionary
+    try:
+        data = response.json()
+    except:
+        return None # Invalid IMDB response
+
+    # Build result dictionary
+    details = {
+            'name': data['name'],
+            'img': 'https://image.tmdb.org/t/p/w185' + data['profile_path']
+            }
+
+    return details
+
+def get_actor_credits(actor_id):
+    """
+    Returns the details of the requested actor.
+
+    Parameters
+    ----------
+    actor_id : int, None
+        The IMDB ID of an actor
+
+    Returns
+    -------
+    movies : list, None
+        A list of dictionaries with the details of each move the actor acted in
+        None if the actor has no movies listed
+    """
+
+    # Return None if the actor could not be found
+    if actor_id is None:
+        return None
+
+    # Construct and execute API query
+    url = f'https://api.themoviedb.org/3/person/{actor_id}/movie_credits'
+    response = requests.get(url, params={'api_key': IMDB_KEY})
+
+    # Convert to dictionary
+    try:
+        data = response.json()
+    except:
+        return None # Invalid IMDB response
+
+    # Return None if actor has no movies
+    if 'cast' not in data.keys():
+        return None
+
+    # Build result list
+    movies = [{
+            'title': movie.get('title'),
+            'year': movie.get('release_date', 'n.d.')[:4],
+            'character': movie.get('character')
+            } for movie in data['cast']]
+
+    return movies
+
+def find_character(title, year, actor_credits):
+    """
+    Returns the character name of the movie matching the title and year
+
+    Parameters
+    ----------
+    title : str
+        The movie title
+    year : str
+        The release date (as a string, could be 'n.d.')
+    actor_credits : list
+        A list of the actor's credits
+
+    Returns
+    -------
+    character : str
+        The name of the actor's character of the movie matching the title and year
+    """
+
+    # Match the title/year to the movie
+    for movie in actor_credits:
+        if movie['title'] == title and movie['year'] == year:
+            break
+
+    return movie['character']

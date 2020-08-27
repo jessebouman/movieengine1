@@ -2,12 +2,15 @@
 
 {% block content %}
 
-{% include '_partials/carousel.html' with css='bg-transparent' %}
 
-<div class="row h2" style="height:20rem">
+<h3 class="text-white mb-3">Enter 2 actors' names.</h3>
+<h3 class="text-white mb-4">Get a list of movies they acted in together.</h3>
+<p class="small text-secondary mb-4">Both fields required for each search</p>
 
-	<!-- PLACEHOLDER FOR MORE CONTENT -->
-
-</div>
+<form class="form-group" action="" method="POST">
+	<div class="form-row mb-2">{{ form.first_actor }}</div>
+	<div class="form-row mb-4">{{ form.second_actor }}</div>
+	<button type="submit" class="btn btn-primary rounded-pill font-weight-bold py-2 px-4">Search</button>
+</form>
 
 {% endblock %}

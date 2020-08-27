@@ -16,6 +16,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -23,9 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', 'imbdactorsearch.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', 'imdbactorsearch.herokuapp.com']
 
 
 # Application definition
@@ -42,9 +43,6 @@ INSTALLED_APPS = [
 
     # My Apps
     'home',
-
-    # Front end
-    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -103,7 +101,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
         os.path.join(BASE_DIR, 'imdb/static'),
-         ("js", os.path.join(STATIC_ROOT, 'js')),
+         #("js", os.path.join(STATIC_ROOT, 'js')),
          ("css", os.path.join(STATIC_ROOT, 'css')),
         ]
 
