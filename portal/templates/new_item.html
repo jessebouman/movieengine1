@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+	<p class="h2 text-center">New Item</p>
+</div>
+<div class="row justify-content-center">
+	<form method="POST" action="" enctype="multipart/form-data" class="mb-5">
+		{% csrf_token %}
+		<div class="form-group">
+			<div class="form-row">
+				Title
+			</div>
+			<div class="form-row">
+				{{ form.title.errors }}
+			</div>
+			<div class="form-row mb-3">
+				{{ form.title }}
+			</div>
+			
+			<div class="form-row">
+				Description
+			</div>
+			<div class="form-row">
+				{{ form.description.errors }}
+			</div>
+			<div class="form-row mb-3">
+				{{ form.description }}
+			</div>
+			
+			<div class="form-row">
+				Price
+			</div>
+			<div class="form-row">
+				{{ form.price.errors }}
+			</div>
+			<div class="form-row mb-3">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text">$</span>
+					</div>
+					{{ form.price }}
+				</div>
+				<span class="small ml-2 my-1">Leave blank if the item is not for sale</span>
+			</div>
+			
+			<div class="form-row mb-3">
+				<div class="col">
+					<div class="form-row">
+						Primary Photo
+					</div>
+					<div class="form-row">
+						{{ form.photo_primary }}
+					</div>
+					<div class="form-row">
+						{{ form.photo_primary.errors }}
+					</div>
+				</div>
+				<div class="col">
+					<div class="form-row">
+						Other Photos
+					</div>
+					<div class="form-row">
+						{{ form.photos }}
+					</div>
+					<div class="form-row">
+						{{ form.photos.errors }}
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-row">
+				<button class="btn btn-block btn-outline-dark" type="submit">Submit</button>
+			</div>
+		</div>
+			
+	</form>
+</div>
+
+{% endblock %}

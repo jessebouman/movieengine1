@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mb-3">
+	<h1>Gallery</h1>
+</div>
+
+<!-- Search/Sort/Filter Form -->
+<div class="row justify-content-center">
+	{% include '_partials/search_form.html' %}
+</div>
+
+<!-- Grid/Detail Toggler -->
+<div class="row justify-content-center mb-5">
+	<ul class="nav nav-pills" id="layout" role="tablist">
+		<li class="nav-item" style="margin: 0px !important">
+			<a class="nav-link material-icons fa-2x active" id="grid" data-toggle="tab" href="#grid_tab" role="tab" aria-controls="grid_tab" aria-selected="true">apps</span>
+			</a>
+		</li>
+		<li class="nav-item" style="margin: 0px !important">
+			<a class="nav-link material-icons fa-2x" id="slides" data-toggle="tab" href="#slide_tab" role="tab" aria-controls="slide_tab" aria-selected="false">menu</a>
+		</li>
+	</ul>
+</div>
+
+<div class="container">
+	<div class="tab-content" id="layoutContent">
+	
+		<!-- Grid Layout -->
+		<div class="tab-pane mb-5 fade show active" id="grid_tab" role="tabpanel" aria-labelledby="grid">
+			<div class="row justify-content-center">
+			{% for item in items %}
+				<div class="col my-4 bg-transparent">
+					<div class="container" style="max-width: 20rem; max-height: 20rem">
+						<a href="gallery/item/{{ item.id }}">
+							<img class="img-link shadow" style="max-width: 20rem; max-height: 20rem; object-fit: contain" src="{{ item.photo_primary }}" alt="Photo for {{ item.name }}"/>
+						</a>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+		
+		<!-- Detail Layout -->
+		<div class="tab-pane fade" id="slide_tab" role="tabpanel" aria-labelledby="slides">
+		{% for item in items %}
+			<div class="row justify-content-end mb-5">
+				<div class="card bg-dark text-white w-100 border-0 shadow-lg" style="max-height: 30rem">
+					<img class="card-img embed-responsive nav-link-bg" style="max-height:30rem; object-fit: cover;" src="{{ item.photo_primary }}" alt="Photo for {{ item.name }}" />
+					<a href="gallery/item/{{ item.id }}" class="card-img-overlay col-md-8 offset-4 nav-link-bg" style="z-index: 1"/>
+					<a href="gallery/item/{{ item.id }}" class="card-img-overlay col-md-4 nav-link-bg-dark text-white">
+						<p class="display-4 text-center card-title">{{ item.name }}</p>
+						{% if item.price > 0 %}
+						<p class="card-text font-italic mb-4 text-center">${{ item.price|floatformat:"-2"|intcomma }}</p>
+						{% endif %}
+						<p class="card-text text-truncate"><pre>{{ item.description }}</pre></p>
+					</a>
+				</div>
+			</div>
+		{% endfor %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}

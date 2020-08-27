@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase Successful{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+	{% if succeeded %}
+	<h1>Thank you!</h1>
+	<p class="mt-5">Your purchase was successful and a receipt has been sent to your email.</p>
+	<p>You will be contacted shortly about your order.</p>
+	{% else %}
+	<h1>Oops!</h1>
+	<p class="mt-5">Your purchase was unsuccessful, please try again.</p>
+	<a href="/gallery/item/{{ item }}" class="btn btn-lg btn-outline-info">Try Again</a>
+	{% endif %}
+</div>
+
+{% endblock %}

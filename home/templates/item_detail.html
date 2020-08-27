@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block tile %}Gallery{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-bottom: 5rem">
+	
+	{% include '_partials/carousel.html' with css='bg-primary shadow' %}
+	
+	<p class="display-4 font-italic my-5 text-center text-dark text-uppercase" style="margin-bottom: .5rem !important">{{ item.name }}</p>
+	{% if item.price > 0 %}
+	<p class="small font-italic text-center">${{ item.price|floatformat:"-2"|intcomma }}</p>
+	{% endif %}
+	
+	<pre class="text-primary text-center mb-5">{{ item.description }}</pre>
+	
+	{% if item.price > 0 %}
+	<div class="row justify-content-center">
+		<button id="buyItem" class="btn btn-outline-info pl-5 pr-5">Buy</button>
+	</div>
+	{% endif %}
+	
+</div>
+
+<!-- JS for Stripe integration -->
+<script type="text/javascript">
+// Get Stripe publishable key
+fetch("/store/config/").then((result) => { return result.json(); }).then((data) => {
+  // Initialize Stripe.js
+  const stripe = Stripe(data.publicKey);
+  
+  // Get ID of the page's item
+  const itemID = "{{ item.id }}"
+
+	// Event handler
+	document.querySelector("#buyItem").addEventListener("click", () => {
+		// Get Checkout Session ID
+		fetch("/store/create-checkout-session/?item=" + itemID).then((result) => { return result.json(); }).then((data) => {
+		  console.log(data);
+		  // Redirect to Stripe Checkout
+		  return stripe.redirectToCheckout({sessionId: data.sessionId})}).then((res) => {
+			console.log(res);
+		  });
+	});
+});
+</script>
+{% endblock %}

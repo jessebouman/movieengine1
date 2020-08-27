@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+	
+<div class="row justify-content-center">
+	<form method="post" class="form-group px-3 w-50">
+		{% csrf_token %}
+		<div id="div_id_username" class="form-group bmd-form-group is-filled"> 
+			<label for="id_username" class="requiredField bmd-label-static">Username<span class="asteriskField">*</span></label> 
+			<div class=""> 
+				<input type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" class="pl-2 form-control textInput textinput" required="" id="id_username"> 
+			</div> 
+		</div>
+		<div id="div_id_password" class="form-group bmd-form-group is-filled"> 
+			<label for="id_password" class="requiredField bmd-label-static">Password<span class="asteriskField">*</span></label>
+			<div class=""> 
+				<input type="password" name="password" autocomplete="current-password" class="pl-2 textinput textInput form-control" required="" id="id_password"> 
+			</div> 
+		</div>
+
+		<button type="submit" class="btn btn-block btn-outline-primary mb-3">Login</button>
+	</form>
+</div>
+
+{% endblock %}
+		

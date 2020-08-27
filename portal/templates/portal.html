@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+	<h1>Admin Portal</h1>
+</div>
+<div class="row justify-content-center mb-5">
+	<a href="logout" class="btn btn-sm btn-outline-danger">Logout</a>
+</div>
+
+<div class="container">
+	<div class="row justify-content-start mb-4">
+		<a href="new" class="btn btn-outline-success">Add New Item</a>
+	</div>
+	<div class="row justify-content-center">
+		{% include '_partials/search_form.html' %}
+	</div>
+	<div class="row">
+		<table class="table table-responsive-lg table-hover">
+			<thead>
+				<tr>
+					<th scope="col"></th>
+					<th scope="col">Name</th>
+					<th scope="col">Description</th>
+					<th scope="col">Price</th>
+					<th scope="col">Edit</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for item in items %}
+				<tr>				
+					<td>
+						<img class="embed-responsive" style="max-width: 10rem;max-height: 10rem;object-fit: fill;" src="{{ item.photo_primary }}"/>
+					</td>
+					<td><a href="/gallery/item/{{ item.id }}">{{ item.name }}</a></td>
+					<td><pre>{{ item.description }}</pre></td>
+					<td>
+						{% if item.price >= 0 %}${{ item.price|floatformat:"2"|intcomma }}{% else %}Not for sale{% endif %}
+					</td>
+					<td>
+						<a href="edit/{{ item.id }}"><span class="material-icons mr-3">settings</span></a>
+					</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+</div>
+{% endblock %}

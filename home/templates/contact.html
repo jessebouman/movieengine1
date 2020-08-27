@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="container-fluid mb-5">
+	<h1 class="text-center">Contact</h1>
+	<p class="text-center"><a href="mailto:againstthegrainhawaii@gmail.com">againstthegrainhawaii@gmail.com</a></p>
+	
+	<div class="row justify-content-center my-5">
+		<div class="col-xl-4">
+			<img class="embed-responsive shadow" src="https://res.cloudinary.com/dc4mk238o/image/upload/s--F1HGW1HH--/v1597084854/againstthegrain/againstthegrain_static/item3_wcgfaj.png" />
+		</div>
+		<div class="col-xl-7 my-3">
+			<form method="POST" action="">
+				<div class="form-group">
+					<div class="form-row">
+						{{ form.first_name.label_tag }}
+					</div>
+					<div class="form-row mb-4">
+						<div class="col" style="padding-left: 0px">
+						 {{ form.first_name }}
+						</div>
+						<div class="col" style="padding-right: 0px">
+						 {{ form.last_name }}
+						</div>
+					</div>
+					
+					<div class="form-row">
+						{{ form.email.label_tag }}
+					</div>
+					<div class="form-row mb-4">
+						{{ form.email }}
+					</div>
+					
+					<div class="form-row">
+						{{ form.message.label_tag }}
+					</div>
+					<div class="form-row mb-4">
+						{{ form.message }}
+					</div>
+					
+					<div class="form-row">
+						<button type="submit" class="btn btn-outline-dark">Submit</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+</div>
+{% endblock %}
