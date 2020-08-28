@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %} {% endblock %}
 
@@ -6,16 +7,18 @@
 
 <!-- result/no result header block -->
 {% if movies %}
-<h3 class="text-center text-white mb-5">Your results.</h3>
+	<h3 class="text-center text-white mb-5">Your results.</h3>
 {% else %}
-<div class="row justify-content-center mb-2">
-	ICON
-</div>
-<p class="h3 text-white text-center mb-3">No results.</p>
-<p class="text-white text-center mb-3">Try double-checking the names of the actors you entered</p>
-<div class="row justify-content-center mb-5">
-	<a href="/" class="btn btn-outline-secondary rounded-pill bg-transparent py-2 px-4">Search another duo</a>
-</div>
+	<div class="row justify-content-center mb-2">
+		<img class="rounded-circle bg-white mb-2" style="width:7rem; height:7rem; object-fit:cover; padding:0.2rem" alt="actor profile photo" src="{% static 'img/actor_default.jpg' %}" />
+	</div>
+	
+	<p class="h3 text-white text-center mb-3">No results.</p>
+	<p class="text-white text-center mb-3 mx-5">Try double-checking the names of the actors you entered</p>
+	
+	<div class="row justify-content-center mb-5">
+		<a href="/" class="btn btn-outline-secondary rounded-pill bg-transparent py-2 px-4">Search another duo</a>
+	</div>
 {% endif %}
 
 <!-- Actor image/names block -->
@@ -24,7 +27,7 @@
 		
 		<div class="col-4">
 			<div class="row justify-content-center">
-				<img class="rounded-circle bg-white mb-2" style="width:7rem; height:7rem; object-fit:cover; padding:0.2rem" alt="actor profile photo" src="{{ actor.img }}" />
+				<img class="rounded-circle bg-white mb-2" style="width:7rem; height:7rem; object-fit:cover; padding:0.2rem" alt="actor profile photo" src="{% if actor.img %}{{ actor.img }}{% else %}{% static 'img/actor_default.jpg' %}{% endif %}" />
 			</div>
 			<div class="row justify-content-center">
 				<span class="text-white text-center">{{ actor.name }}</span>
@@ -36,24 +39,24 @@
 
 <!-- Movie list block -->
 {% if movies %}
-<div class="row justify-content-center mx-2 mb-5">
-	<ul class="list-unstyled text-white">
-	{% for movie in movies %}
-		<li class="row mb-2">
-			<div class="col-1"><i class="text-center fas fa-tag mt-2"></i></div>
-			<div class="col">
-				<a target="blank" href="{% if movie.link %}https://www.imdb.com/title/{{ movie.link }}/{% else %}#{% endif %}">
-					{{ movie.title }}
-					<i class="fas fa-angle-double-right text-white" style="width:.8rem; height:.8rem;padding-bottom:.2rem"></i>
-				</a> 
-				({{ movie.year }}) as {{ movie.characters.0 }} and {{ movie.characters.1 }}
-			</div>
-		</li>
-	{% endfor %}
-	</ul>
-</div>
+	<div class="row justify-content-center mx-2 mb-5">
+		<ul class="list-unstyled text-white">
+		{% for movie in movies %}
+			<li class="row mb-2">
+				<div class="col-1"><i class="text-center fas fa-tag mt-2"></i></div>
+				<div class="col">
+					<a target="blank" href="{% if movie.link %}https://www.imdb.com/title/{{ movie.link }}/{% else %}#{% endif %}">
+						{{ movie.title }}
+						<i class="fas fa-angle-double-right text-white" style="width:.8rem; height:.8rem;padding-bottom:.2rem"></i>
+					</a> 
+					({{ movie.year }}) as {{ movie.characters.0 }} and {{ movie.characters.1 }}
+				</div>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+	
+	<p class="small text-center"><a href="/"><u>Search another duo</u></a></p>
 {% endif %}
-
-<p class="small text-center"><a href="/"><u>Search another duo</u></a></p>
 
 {% endblock %}

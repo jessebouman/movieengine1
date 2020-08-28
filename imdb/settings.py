@@ -15,7 +15,8 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
+os.environ['SECRET_KEY'] = 'x0gfru_vxecm*737zhmrv7qz6(=cws=yxfp19v0t4xc9nvg^v3'
+os.environ['IMDB_KEY'] = 'a35347e2740e5e238237f6050689ccfe'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -101,8 +102,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
         os.path.join(BASE_DIR, 'imdb/static'),
-         #("js", os.path.join(STATIC_ROOT, 'js')),
          ("css", os.path.join(STATIC_ROOT, 'css')),
+         ("img", os.path.join(STATIC_ROOT, 'img')),
         ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -115,5 +116,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'email@gmail.com'
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
-DEFAULT_FROM_EMAIL = 'Owner <emaili@gmail.com>'
+DEFAULT_FROM_EMAIL = 'Owner <email@gmail.com>'
 """
