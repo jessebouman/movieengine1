@@ -81,6 +81,9 @@ def get_actor_details(actor):
         None if the actor does not exist in the IMDB API
     """
 
+    # Default result
+    details = {'id': None, 'name': actor}
+
     # Construct and execute API query
     url = 'https://api.themoviedb.org/3/search/person'
     params = {
@@ -94,14 +97,13 @@ def get_actor_details(actor):
     try:
         data = response.json()
     except:
-        return {'id': None, 'name': actor} # Invalid IMDB response
+        return details # Invalid IMDB response
 
     # Check if the actor exists
     if not data['results']:
-        return {'id': None, 'name': actor}
+        return details
 
     # Find first actor in results
-    details = None
     for entry in data['results']:
         if entry['known_for_department'] == 'Acting':
             details = {
@@ -115,7 +117,7 @@ def get_actor_details(actor):
 
 def get_actor_credits(actor_id):
     """
-    Returns the details of the requested actor.
+    Finds a list of movies the requested actor has acted in
 
     Parameters
     ----------
@@ -125,7 +127,7 @@ def get_actor_credits(actor_id):
     Returns
     -------
     movies : list, None
-        A list of dictionaries with the details of each move the actor acted in
+        A list of dictionaries with the details of each movie the actor acted in
         None if the actor has no movies listed
     """
 
