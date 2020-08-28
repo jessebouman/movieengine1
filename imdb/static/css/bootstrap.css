@@ -1393,12 +1393,30 @@ pre {
   .table-responsive > .table-bordered {
     border: 0; }
 
+input:focus ~ .floating-label,
+input:not(:focus):valid ~ .floating-label{
+  position: relative;
+  top: -3.2rem;
+  bottom: 10px;
+  left: 1.1rem;
+  font-size: 11px;
+  opacity: 1;
+}
+
+.floating-label {
+  position: relative;
+  pointer-events: none;
+  top: -2.6rem;
+  left: 1.2rem;
+  transition: 0.2s ease all;
+}
+
 .form-control {
   display: block;
   width: 100%;
   height: calc(1.5em + 0.75rem + 2px);
   padding: 0.375rem 0.75rem;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 400;
   line-height: 1.5;
   color: #fff;

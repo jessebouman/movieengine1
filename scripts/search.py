@@ -38,6 +38,10 @@ def handle_search(*actors):
     if None in actor_ids or None in actor_credits:
         return None, actor_details
 
+    # If both actors are the same, return None
+    if len(list(dict.fromkeys(actor_ids))) < 2:
+        return None, actor_details
+
     # Find any matches between the sets of movies
     actor_movie_sets = [set((m['title'], m['year'], m['id']) for m in c) for c in actor_credits]
     shared_movies = set.intersection(*actor_movie_sets)
@@ -109,7 +113,7 @@ def get_actor_details(actor):
             details = {
                     'id': entry['id'],
                     'name': entry['name'],
-                    'img': 'https://image.tmdb.org/t/p/w185' + entry['profile_path']
+                    'img': 'https://image.tmdb.org/t/p/w185' + entry['profile_path'] if entry['profile_path'] else ''
                     }
             break
 
