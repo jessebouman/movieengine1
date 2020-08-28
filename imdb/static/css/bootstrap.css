@@ -1803,8 +1803,8 @@ fieldset:disabled a.btn {
 
 .btn-secondary {
   color: #212529;
-  background-color: rgba(248, 243, 243, 0.75);
-  border-color: rgba(248, 243, 243, 0.75); }
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.3); }
   .btn-secondary:hover {
     color: #212529;
     background-color: rgba(234, 219, 219, 0.75);
