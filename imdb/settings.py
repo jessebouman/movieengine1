@@ -15,8 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-os.environ['SECRET_KEY'] = 'x0gfru_vxecm*737zhmrv7qz6(=cws=yxfp19v0t4xc9nvg^v3'
-os.environ['IMDB_KEY'] = 'a35347e2740e5e238237f6050689ccfe'
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
