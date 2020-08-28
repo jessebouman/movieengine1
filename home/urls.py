@@ -4,7 +4,6 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('finding/actors=<str:first_actor>,<str:second_actor>', views.find, name='find'),
-    path('result/', views.result, name='result'),
+    path('finding/actors=<str:first_actor>,<str:second_actor>', views.result, name='result'),
 ]
 

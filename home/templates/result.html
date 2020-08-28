@@ -4,8 +4,21 @@
 
 {% block content %}
 
+<!-- result/no result header block -->
+{% if movies %}
 <h3 class="text-center text-white mb-5">Your results.</h3>
+{% else %}
+<div class="row justify-content-center mb-2">
+	ICON
+</div>
+<p class="h3 text-white text-center mb-3">No results.</p>
+<p class="text-white text-center mb-3">Try double-checking the names of the actors you entered</p>
+<div class="row justify-content-center mb-5">
+	<a href="/" class="btn btn-outline-secondary rounded-pill bg-transparent py-2 px-4">Search another duo</a>
+</div>
+{% endif %}
 
+<!-- Actor image/names block -->
 <div class="row justify-content-around mb-5">
 	{% for actor in actors %}
 		
@@ -21,16 +34,25 @@
 	{% endfor %}
 </div>
 
+<!-- Movie list block -->
+{% if movies %}
 <div class="row justify-content-center mx-2 mb-5">
 	<ul class="list-unstyled text-white">
 	{% for movie in movies %}
 		<li class="row mb-2">
 			<div class="col-1"><i class="text-center fas fa-tag mt-2"></i></div>
-			<div class="col">{{ movie.title }} ({{ movie.year }}) as {{ movie.characters.0 }} and {{ movie.characters.1 }}</div>
+			<div class="col">
+				<a target="blank" href="{% if movie.link %}https://www.imdb.com/title/{{ movie.link }}/{% else %}#{% endif %}">
+					{{ movie.title }}
+					<i class="fas fa-angle-double-right text-white" style="width:.8rem; height:.8rem;padding-bottom:.2rem"></i>
+				</a> 
+				({{ movie.year }}) as {{ movie.characters.0 }} and {{ movie.characters.1 }}
+			</div>
 		</li>
 	{% endfor %}
 	</ul>
 </div>
+{% endif %}
 
 <p class="small text-center"><a href="/"><u>Search another duo</u></a></p>
 

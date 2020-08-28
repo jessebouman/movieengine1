@@ -27,11 +27,9 @@ def handle_search(*actors):
         A list of dictionaries with the actor details
     """
 
-    # Get ID for each actor
-    actor_ids = list(map(lambda a : get_actor_id(a), actors))
-
-    # Get profile details for each actor
-    actor_details = list(map(lambda a_id : get_actor_details(a_id), actor_ids))
+    # Search and get profile details for each actor
+    actor_details = list(map(lambda actor : get_actor_details(actor), actors))
+    actor_ids = [actor['id'] for actor in actor_details]
 
     # Get acting roles for each actor
     actor_credits = list(map(lambda a_id : get_actor_credits(a_id), actor_ids))
@@ -41,19 +39,20 @@ def handle_search(*actors):
         return None, actor_details
 
     # Find any matches between the sets of movies
-    actor_movie_sets = [set((m['title'], m['year']) for m in c) for c in actor_credits]
+    actor_movie_sets = [set((m['title'], m['year'], m['id']) for m in c) for c in actor_credits]
     shared_movies = set.intersection(*actor_movie_sets)
 
-    # If there are no shared movies, return empty list and actor details
+    # If there are no shared movies, return None and actor details
     if not shared_movies:
-        return [], actor_details
+        return None, actor_details
 
     # Build result list
     movies = []
-    for title, year in shared_movies:
+    for title, year, imdb_id in shared_movies:
         tmp = {
                 'title': title,
                 'year': year,
+                'link': get_movie_link(imdb_id)
                 }
 
         # find character names for the shared movie
@@ -64,21 +63,22 @@ def handle_search(*actors):
 
     return movies, actor_details
 
-def get_actor_id(actor):
+def get_actor_details(actor):
     """
-    Returns the ID of the requested actor.
+    Returns the ID, name, and profile picture of the requested actor.
     If multiple actors with the same name exist, choose the first actor result # BUG
     If no actor exists, return None
 
     Parameters
     ----------
     actor : str
-        A actor's name
+        An actor's name
 
     Returns
     -------
-    actor_id : int, None
-        The IMDB API ID of the actor or None if the actor does not exist in the IMDB API
+    details : dict, None
+        The IMDB API ID, name, and photo of the actor
+        None if the actor does not exist in the IMDB API
     """
 
     # Construct and execute API query
@@ -94,55 +94,22 @@ def get_actor_id(actor):
     try:
         data = response.json()
     except:
-        return None # Invalid IMDB response
+        return {'id': None, 'name': actor} # Invalid IMDB response
 
     # Check if the actor exists
     if not data['results']:
-        return  None
+        return {'id': None, 'name': actor}
 
     # Find first actor in results
-    actor_id = None
+    details = None
     for entry in data['results']:
         if entry['known_for_department'] == 'Acting':
-            actor_id = entry['id']
+            details = {
+                    'id': entry['id'],
+                    'name': entry['name'],
+                    'img': 'https://image.tmdb.org/t/p/w185' + entry['profile_path']
+                    }
             break
-
-    return actor_id
-
-def get_actor_details(actor_id):
-    """
-    Returns the details of the requested actor.
-
-    Parameters
-    ----------
-    actor_id : int, None
-        The IMDB ID of an actor
-
-    Returns
-    -------
-    details : dict, None
-        the IMDB API ID of the actor or None if the actor_id is None
-    """
-
-    # Return None if the actor could not be found
-    if actor_id is None:
-        return None
-
-    # Construct and execute API query
-    url = f'https://api.themoviedb.org/3/person/{actor_id}'
-    response = requests.get(url, params={'api_key': IMDB_KEY})
-
-    # Convert to dictionary
-    try:
-        data = response.json()
-    except:
-        return None # Invalid IMDB response
-
-    # Build result dictionary
-    details = {
-            'name': data['name'],
-            'img': 'https://image.tmdb.org/t/p/w185' + data['profile_path']
-            }
 
     return details
 
@@ -184,10 +151,43 @@ def get_actor_credits(actor_id):
     movies = [{
             'title': movie.get('title'),
             'year': movie.get('release_date', 'n.d.')[:4],
+            'id': movie.get('id'),
             'character': movie.get('character')
             } for movie in data['cast']]
 
     return movies
+
+def get_movie_link(movie_id):
+    """
+    Returns the IMDB page link for the requested movie.
+
+    Parameters
+    ----------
+    movie_id : int
+        A TMDB movie ID
+
+    Returns
+    -------
+    link : str
+        The IMDB page url of the requested movie
+        Empty string if the movie does not have an IMDB page
+    """
+
+    # Sanity check - make sure an int is passed
+    if not isinstance(movie_id, int):
+        return ''
+
+    # Construct and execute API query
+    url = f'https://api.themoviedb.org/3/movie/{movie_id}'
+    response = requests.get(url, params={'api_key': IMDB_KEY})
+
+    # Convert to dictionary
+    try:
+        data = response.json()
+    except:
+        return '' # Invalid IMDB response
+
+    return data.get('imdb_id', '')
 
 def find_character(title, year, actor_credits):
     """

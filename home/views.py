@@ -16,7 +16,7 @@ def home(request):
         form = forms.ActorSearch(request.POST)
         if form.is_valid():
             cleaned = form.cleaned_data
-            return redirect(reverse('find', args=[*list(cleaned.values())]))
+            return redirect(reverse('result', args=[*list(cleaned.values())]))
     else:
         form = forms.ActorSearch()
 
@@ -26,7 +26,7 @@ def home(request):
             }
     return render(request, 'home.html', context)
 
-def find(request, **actors):
+def result(request, **actors):
     """
     Finds the result of the two actors entered on the homepage
     Displays a loading spinner during search, then redirects to result/no result page
@@ -44,7 +44,3 @@ def find(request, **actors):
             'movies': result[0]
             }
     return render(request, 'result.html', context)
-
-def result(request):
-
-    return render(request, 'result.html', {})
