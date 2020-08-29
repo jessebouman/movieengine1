@@ -22,27 +22,35 @@ Please visit https://www.spencerfd.me for my contact information, portfolio, and
   <link rel="apple-touch-icon" href="#">
   
   <!--     Fonts and icons     -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://rsms.me/inter/inter.css" rel="stylesheet">
-  <script src="https://use.fontawesome.com/releases/v5.13.0/js/all.js" crossorigin="anonymous"></script>
+  
   <!-- CSS Files -->
   <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" />
 </head>
 
-<body class="m-1" style="background: linear-gradient(180deg, #F77062 0%, #FE5196 100%); font-family: Inter;">
+<body class="m-1" style="font-family: Inter;">
 
 	{% include '_partials/navbar.html' %}
 	
 	<div class="container-fluid px-4">
-	{% block content %} {% endblock %}
+		{% block content %} {% endblock %}
+		
+		<!-- Twitter button -->
+		<div class="bg-transparent navbar mr-1 mb-2" style="position: fixed; bottom: 0; left: 0; right: 0">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a href="https://www.twitter.com/jessebouman">
+						<img alt="Twitter" src="{% static 'img/twitter.svg' %}">
+					</a>
+				</li>
+			</ul>
+		</div>
 	</div>
 	
   
   <!--   Core JS Files   -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-  <!-- Third party plugin JS-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
 </body>
 
 </html>

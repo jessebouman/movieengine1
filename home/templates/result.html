@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} {% endblock %}
-
 {% block content %}
 
 <!-- background reel image -->
-<img alt="background photo reel" src="{% static 'img/reel.svg' %}" class="fixed-bottom ml-5" style="position: fixed;z-index: -1;opacity: .2;" />
+<img alt="background photo reel" src="{% static 'img/reel.svg' %}" style="position: fixed; bottom: 0; right: 0; z-index: -1;opacity: .2;" />
 
 <!-- result/no result header block -->
 {% if movies %}
@@ -40,9 +38,9 @@
 	<div class="row justify-content-center mx-2 mb-3">
 		<ul class="list-unstyled text-white">
 		{% for movie in movies %}
-			<li class="row mb-2">
-				<div class="col-1"><i class="text-center fas fa-tag mt-2"></i></div>
-				<div class="col">
+			<li class="row mb-4">
+				<div class="col-1"><img alt="tag" class="" src="{% static 'img/tag.svg' %}" /></div>
+				<div class="col" style="font-size: 14px; font-weight: 500;">
 					<a target="blank" href="{% if movie.link %}https://www.imdb.com/title/{{ movie.link }}/{% else %}#{% endif %}">
 						{{ movie.title }}
 						<i class="fas fa-angle-double-right text-white" style="width:.8rem; height:.8rem;padding-bottom:.2rem"></i>
@@ -56,7 +54,7 @@
 {% endif %}
 
 <!-- Search another duo button -->
-<div class="row">
+<div class="row mb-5">
 	<a class="btn btn-block btn-warning text-dark mx-3" style="font-weight: 600; font-size: 14px;" href="/">Search another duo</a>
 </div>
 
