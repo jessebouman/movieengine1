@@ -5,19 +5,17 @@
 
 {% block content %}
 
+<!-- background reel image -->
+<img alt="background photo reel" src="{% static 'img/reel.svg' %}" class="fixed-bottom ml-5" style="position: fixed;z-index: -1;opacity: .2;" />
+
 <!-- result/no result header block -->
 {% if movies %}
-	<h3 class="text-center text-white mb-5">Your results.</h3>
+	<h1 class="text-center text-white mb-5 mt-5" style="font-size: 20px">Yes! They did work together!</h1>
 {% else %}
-	<div class="row justify-content-center mb-2">
-		<img class="rounded-circle bg-white mb-2" style="width:7rem; height:7rem; object-fit:cover; padding:0.2rem" alt="actor profile photo" src="{% static 'img/actor_default.jpg' %}" />
-	</div>
-	
-	<p class="h3 text-white text-center mb-3">No results.</p>
-	<p class="text-white text-center mb-3 mx-5">Try double-checking the names of the actors you entered</p>
-	
-	<div class="row justify-content-center mb-5">
-		<a href="/" class="btn btn-outline-secondary rounded-pill bg-transparent py-2 px-4">Search another duo</a>
+	<div class="text-center my-5">
+		<h1>Oh no! No results.</h1>
+		<h1>¯\_(ツ)_/¯</h1>
+		<p class="text-light mt-4" style="font-size: 14px; font-weight: 500">Looks like these two actors haven't acted together</p>
 	</div>
 {% endif %}
 
@@ -27,7 +25,7 @@
 		
 		<div class="col-4">
 			<div class="row justify-content-center">
-				<img class="rounded-circle bg-white mb-2" style="width:7rem; height:7rem; object-fit:cover; padding:0.2rem" alt="actor profile photo" src="{% if actor.img %}{{ actor.img }}{% else %}{% static 'img/actor_default.jpg' %}{% endif %}" />
+				<img class="rounded-circle bg-white mb-2" style="width:6rem; height:6rem; object-fit:cover; padding:4px" alt="actor profile photo" src="{% if actor.img %}{{ actor.img }}{% else %}{% static 'img/actor_default.jpg' %}{% endif %}" />
 			</div>
 			<div class="row justify-content-center">
 				<span class="text-white text-center">{{ actor.name }}</span>
@@ -39,7 +37,7 @@
 
 <!-- Movie list block -->
 {% if movies %}
-	<div class="row justify-content-center mx-2 mb-5">
+	<div class="row justify-content-center mx-2 mb-3">
 		<ul class="list-unstyled text-white">
 		{% for movie in movies %}
 			<li class="row mb-2">
@@ -55,8 +53,11 @@
 		{% endfor %}
 		</ul>
 	</div>
-	
-	<p class="small text-center"><a href="/"><u>Search another duo</u></a></p>
 {% endif %}
+
+<!-- Search another duo button -->
+<div class="row">
+	<a class="btn btn-block btn-warning text-dark mx-3" style="font-weight: 600; font-size: 14px;" href="/">Search another duo</a>
+</div>
 
 {% endblock %}

@@ -3,15 +3,15 @@
 {% block content %}
 
 
-<h3 class="text-white mb-3">Enter 2 actors' names.</h3>
-<h3 class="text-white mb-4">Get a list of movies they acted in together.</h3>
-<p class="small text-secondary mb-4">Both fields required for each search</p>
+<h1 class="text-white mb-3" style="margin-top: 5rem">Enter 2 actors' names.</h1>
+<h1 class="text-white mb-4">See what movies they starred in together.</h1>
+<p class="text-light mb-4" style="font-size: 12px; font-weight: 200">Both fields required for each search</p>
 
 <form class="form-group" action="" method="POST">
 	<div class="form-row mb-2 text-white list-unstyled ml-0 small">{{ form.non_field_errors.0 }}{{ form.first_actor.errors }}{{ form.second_actor.errors }}</div>
-	<div class="form-row" style="margin-bottom: -1rem">{{ form.first_actor }}<label for="first_actor" class="floating-label text-secondary">First actor</span></div>
-	<div class="form-row mb-1">{{ form.second_actor }}<label for="second_actor" class="floating-label text-secondary">Second actor</span></div>
-	<button type="submit" class="btn btn-primary rounded-pill font-weight-bold py-2 px-4">Search</button>
+	<div class="form-row" style="margin-bottom: -1rem">{{ form.first_actor }}<label for="first_actor" class="floating-label">First actor</span></div>
+	<div class="form-row mb-1">{{ form.second_actor }}<label for="second_actor" class="floating-label">Second actor</span></div>
+	<button type="submit" class="btn btn-warning text-dark px-4" style="font-size: 14px; font-weight: 600; line-height: 24px; padding-top: 12px; padding-bottom: 12px;">Search</button>
 </form>
 
 {% endblock %}

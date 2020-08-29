@@ -1,15 +1,15 @@
-<nav class="bg-transparent navbar navbar-expand-lg mx-auto my-3">
+{% load static %}
+<nav class="bg-transparent navbar navbar-expand-lg mx-auto my-4 px-3">
 	<div class="container-fluid">
 		
 		<a class="navbar-brand" href='/'>
-			<span class="text-center" style="margin-bottom:0">Movie</span>
-			<p class="text-center font-weight-bold" style="margin-bottom:0; margin-top:0">Engine</p>
+			<img alt="Movie Engine Logo" class="embed-responsive" style="width: 6rem" src="{% static 'img/logo_white.svg' %}">
 		</a>
 			
 		<ul class="navbar-nav ml-auto">
 		
 			<li class="nav-item">
-				<a class="border-0 btn btn-secondary nav-link px-4 text-white" style="border-radius: 1rem" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=[[EMAILHERE]]&currency_code=USD&source=url">Donate</a>
+				<a class="border-0 btn btn-secondary text-white py-2" style="border-radius: .8rem; font-size: 14px; font-weight: 600; padding-left: 18px; padding-right: 18px;" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=jesse.bouman%40gmail.com&currency_code=USD&source=url">Donate</a>
 			</li>
 			
 		</ul>
