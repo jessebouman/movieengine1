@@ -8,7 +8,7 @@
 
 <!-- result/no result header block -->
 {% if movies %}
-	<h1 class="text-center text-white mb-5 mt-5" style="font-size: 20px">Yes! They did work together!</h1>
+	<h1 class="text-center text-light mb-5 mt-5" style="font-size: 20px">Yes! They did work together!</h1>
 {% else %}
 	<div class="text-center my-5">
 		<h1>Oh no! No results.</h1>
@@ -23,10 +23,10 @@
 		
 		<div class="col-4">
 			<div class="row justify-content-center">
-				<img class="rounded-circle bg-white mb-2" style="width:6rem; height:6rem; object-fit:cover; padding:4px" alt="actor profile photo" src="{% if actor.img %}{{ actor.img }}{% else %}{% static 'img/actor_default.jpg' %}{% endif %}" />
+				<img class="rounded-circle mb-2" style="background-color: #f4f0f0; width:6rem; height:6rem; object-fit:cover; padding:4px" alt="actor profile photo" src="{% if actor.img %}{{ actor.img }}{% else %}{% static 'img/actor_default.jpg' %}{% endif %}" />
 			</div>
 			<div class="row justify-content-center">
-				<span class="text-white text-center">{{ actor.name }}</span>
+				<span class="text-light text-center">{{ actor.name }}</span>
 			</div>
 		</div>
 		
@@ -36,7 +36,7 @@
 <!-- Movie list block -->
 {% if movies %}
 	<div class="row justify-content-center mx-2 mb-3">
-		<ul class="list-unstyled text-white">
+		<ul class="list-unstyled text-light">
 		{% for movie in movies %}
 			<li class="row mb-4">
 				<div class="col-1"><img alt="tag" class="" src="{% static 'img/tag.svg' %}" /></div>
@@ -54,7 +54,7 @@
 {% endif %}
 
 <!-- Search another duo button -->
-<div class="row mb-5">
+<div class="row mb-3">
 	<a class="btn btn-block btn-warning text-dark mx-3" style="font-weight: 600; font-size: 14px;" href="/">Search another duo</a>
 </div>
 

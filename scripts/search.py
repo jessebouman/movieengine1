@@ -8,6 +8,7 @@ Script to handle actor search
 """
 import os
 import requests
+from fuzzywuzzy import fuzz
 
 IMDB_KEY = os.environ.get('IMDB_KEY')
 
@@ -70,7 +71,7 @@ def handle_search(*actors):
 def get_actor_details(actor):
     """
     Returns the ID, name, and profile picture of the requested actor.
-    If multiple actors with the same name exist, choose the first actor result # BUG
+    If multiple actors with the same name exist, choose the most popular actor
     If no actor exists, return None
 
     Parameters
@@ -106,16 +107,23 @@ def get_actor_details(actor):
     # Check if the actor exists
     if not data['results']:
         return details
+    else:
+        data = data['results']
 
-    # Find first actor in results
-    for entry in data['results']:
-        if entry['known_for_department'] == 'Acting':
-            details = {
-                    'id': entry['id'],
-                    'name': entry['name'],
-                    'img': 'https://image.tmdb.org/t/p/w185' + entry['profile_path'] if entry['profile_path'] else ''
-                    }
-            break
+    # Filter for actors loosely matching string query
+    data = list(filter(lambda d : d['known_for_department'] == 'Acting', data))
+    data = list(filter(lambda d : match_name(actor, d['name']) > 175, data))
+    if not data:
+        return details # No actors in result list
+
+    # Sort by popularity and choose the most popular actor
+    data = sorted(data, key = lambda a : a['popularity'], reverse=True)
+    entry = data[0]
+    details = {
+            'id': entry['id'],
+            'name': entry['name'],
+            'img': 'https://image.tmdb.org/t/p/w185' + entry['profile_path'] if entry['profile_path'] else ''
+            }
 
     return details
 
@@ -220,3 +228,37 @@ def find_character(title, year, actor_credits):
             break
 
     return movie['character']
+
+def match_name(actor, entry):
+    """
+    Returns a score (0-100) signifying the alikeness between the actor name and the entry
+
+    Parameters
+    ----------
+    actor : str
+        The search string
+    entry : str
+        A potential result
+
+    Returns
+    -------
+    score : int
+        A score between 0 and 200
+    """
+
+    # Split and normalize strings
+    search_string = actor.lower().split(' ')
+    entry_names = entry.lower().split(' ')
+
+    # If only one name is entered, choose the best match
+    if len(search_string) == 1:
+        first_name_score = fuzz.partial_ratio(search_string[0], entry_names[0])
+        last_name_score = fuzz.partial_ratio(search_string[0], entry_names[-1])
+        if first_name_score > last_name_score:
+            return first_name_score * 2
+        else:
+            return last_name_score *2
+    else:
+        first_name_score = fuzz.partial_ratio(search_string[0], entry_names[0])
+        last_name_score = fuzz.partial_ratio(search_string[-1], entry_names[-1])
+        return first_name_score + last_name_score
