@@ -44,7 +44,7 @@ def handle_search(*actors):
         return None, actor_details
 
     # Find any matches between the sets of movies
-    actor_movie_sets = [set((m['title'], m['year'], m['id']) for m in c) for c in actor_credits]
+    actor_movie_sets = [set(list(movie_ids)) for movie_ids in actor_credits]
     shared_movies = set.intersection(*actor_movie_sets)
 
     # If there are no shared movies, return None and actor details
@@ -52,19 +52,13 @@ def handle_search(*actors):
         return None, actor_details
 
     # Build result list
-    movies = []
-    for title, year, imdb_id in shared_movies:
-        tmp = {
-                'title': title,
-                'year': year,
-                'link': get_movie_link(imdb_id)
-                }
-
-        # find character names for the shared movie
-        characters = [find_character(title, year, a_credits) for a_credits in actor_credits]
-        tmp['characters'] = characters
-
-        movies.append(tmp)
+    movies = [{
+            'title': actor_credits[0][m_id]['title'],
+            'year': actor_credits[0][m_id]['year'],
+            'characters': [a[m_id]['character'] for a in actor_credits],
+            'link': get_movie_link(m_id),
+            } for m_id in shared_movies]
+    movies = sorted(movies, key = lambda m : m['year'], reverse=True) # sort by oldest -> newest
 
     return movies, actor_details
 
@@ -161,14 +155,30 @@ def get_actor_credits(actor_id):
     # Return None if actor has no movies
     if 'cast' not in data.keys():
         return None
+    else:
+        data = data['cast']
+
+    # Filter out "Making of" entries
+    def character_filter(character):
+        if not character:
+            return False
+
+        for c in ['himself', 'herself', 'self']:
+            if c in character.lower():
+                return False
+
+        return True
+
+    data = list(filter(lambda d : character_filter(d['character']), data))
 
     # Build result list
-    movies = [{
-            'title': movie.get('title'),
-            'year': movie.get('release_date', 'n.d.')[:4],
-            'id': movie.get('id'),
-            'character': movie.get('character')
-            } for movie in data['cast']]
+    movies = {
+            movie.get('id'): {
+                    'title': movie.get('title'),
+                    'year': movie.get('release_date', 'n.d.')[:4],
+                    'character': movie.get('character', '')
+                    } for movie in data
+            }
 
     return movies
 
@@ -204,35 +214,9 @@ def get_movie_link(movie_id):
 
     return data.get('imdb_id', '')
 
-def find_character(title, year, actor_credits):
-    """
-    Returns the character name of the movie matching the title and year
-
-    Parameters
-    ----------
-    title : str
-        The movie title
-    year : str
-        The release date (as a string, could be 'n.d.')
-    actor_credits : list
-        A list of the actor's credits
-
-    Returns
-    -------
-    character : str
-        The name of the actor's character of the movie matching the title and year
-    """
-
-    # Match the title/year to the movie
-    for movie in actor_credits:
-        if movie['title'] == title and movie['year'] == year:
-            break
-
-    return movie['character']
-
 def match_name(actor, entry):
     """
-    Returns a score (0-100) signifying the alikeness between the actor name and the entry
+    Returns a score (0-200) signifying the alikeness between the actor name and the entry
 
     Parameters
     ----------
@@ -248,18 +232,17 @@ def match_name(actor, entry):
     """
 
     # Split and normalize strings
-    search_string = actor.lower().split(' ')
+    search_string = actor.strip().lower().split(' ')
     entry_names = entry.lower().split(' ')
 
-    # If only one name is entered, choose the best match
-    if len(search_string) == 1:
+    if len(search_string) == 1: # If only one name is entered, choose the best match
         first_name_score = fuzz.partial_ratio(search_string[0], entry_names[0])
         last_name_score = fuzz.partial_ratio(search_string[0], entry_names[-1])
         if first_name_score > last_name_score:
             return first_name_score * 2
         else:
             return last_name_score *2
-    else:
+    else: # If two names are entered return the composite score
         first_name_score = fuzz.partial_ratio(search_string[0], entry_names[0])
         last_name_score = fuzz.partial_ratio(search_string[-1], entry_names[-1])
         return first_name_score + last_name_score
