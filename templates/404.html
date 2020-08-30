@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<div class="container" style="min-height:30rem">
+<div class="container" style="min-height:20rem">
 
-	<div class="justify-content-center row text-center text-white" style="margin-top: 10rem;">
+	<!-- background reel image -->
+	<img alt="background photo reel" src="{% static 'img/reel.svg' %}" style="position: fixed; bottom: 0; right: 0; z-index: -1;opacity: .2;" />
+
+	<div class="justify-content-center row text-center text-light" style="margin-top: 8rem;">
 		<h1>Oops!<br>The page you requested could not be found.</h1>
 	</div>
 

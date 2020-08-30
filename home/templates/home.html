@@ -1,26 +1,43 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<!-- Home Screen Header -->
-<h1 class="text-light mb-3" style="margin-top: 5rem">Enter 2 actors' names.</h1>
-<h1 class="text-light mb-4">See what movies they starred in together.</h1>
-<p class="text-light mb-4" style="font-size: 12px; font-weight: 200">Both fields required for each search</p>
+<div class="row">
+	<!-- Extra padding for large devices -->
+	<div class="col-1 d-none d-md-block"></div>
+	
+	<!-- Film strip image for large screens -->
+	<div class="col-3 mr-5 d-none d-md-block">
+		<img alt="film strip" class="embed-responsive img-fluid" style="height: 35rem; object-fit: none" src="{% static 'img/film_strip.png' %}">
+	</div>
 
-<!-- Search Form -->
-<form class="form-group" action="" method="POST">
-	<div class="form-row mb-2 text-white list-unstyled ml-0 small">{{ form.non_field_errors.0 }}{{ form.first_actor.errors }}{{ form.second_actor.errors }}</div>
-	<div class="form-row" style="margin-bottom: -1rem">
-		{{ form.first_actor }}
-		<label for="first_actor" class="floating-label">First actor</span>
+	<div class="col px-4 mt-5">
+		<!-- Home Screen Header -->
+		<h1 class="text-light mb-3">Enter 2 actors' names.</h1>
+		<h1 class="text-light mb-4">See what movies they starred in together.</h1>
+		<p class="text-light mb-4" style="font-size: 12px; font-weight: 200">Both fields required for each search</p>
+
+		<!-- Search Form -->
+		<form class="form-group" action="" method="POST">
+			<div class="form-row mb-2 text-white list-unstyled ml-0 small">{{ form.non_field_errors.0 }}{{ form.first_actor.errors }}{{ form.second_actor.errors }}</div>
+			<div class="form-row" style="margin-bottom: -1rem">
+				{{ form.first_actor }}
+				<label for="first_actor" class="floating-label">First actor</span>
+			</div>
+			<div class="form-row">
+				{{ form.second_actor }}
+				<label for="second_actor" class="floating-label">Second actor</span>
+			</div>
+			<div class="form-row">
+				<button type="submit" class="btn btn-warning text-dark px-4" style="font-size: 14px; font-weight: 600; line-height: 24px; padding-top: 12px; padding-bottom: 12px;">Search</button>
+			</div>
+		</form>
 	</div>
-	<div class="form-row">
-		{{ form.second_actor }}
-		<label for="second_actor" class="floating-label">Second actor</span>
-	</div>
-	<div class="form-row">
-		<button type="submit" class="btn btn-warning text-dark px-4" style="font-size: 14px; font-weight: 600; line-height: 24px; padding-top: 12px; padding-bottom: 12px;">Search</button>
-	</div>
-</form>
+	
+	<!-- Extra padding for large devices -->
+	<div class="col-2 d-none d-md-block"></div>
+	
+</div>
 
 {% endblock %}

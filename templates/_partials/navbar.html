@@ -1,18 +1,43 @@
 {% load static %}
-<nav class="bg-transparent navbar navbar-expand-lg mx-auto my-4 px-3">
-	<div class="container-fluid">
-		
-		<a class="navbar-brand" href='/'>
-			<img alt="Movie Engine Logo" class="embed-responsive" style="width: 6rem" src="{% static 'img/logo_white.svg' %}">
-		</a>
-			
-		<ul class="navbar-nav ml-auto">
-		
-			<li class="nav-item">
-				<a class="border-0 btn btn-secondary text-white py-2" style="border-radius: .8rem; font-size: 14px; font-weight: 600; padding-left: 18px; padding-right: 18px;" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=jesse.bouman%40gmail.com&currency_code=USD&source=url">Donate</a>
-			</li>
-			
-		</ul>
 
-	</div>
-</nav>
+<!-- Mobile navbar -->
+<div class="d-md-none">
+	<nav class="d-md-none bg-transparent navbar navbar-expand-lg mx-auto my-4 px-3" style="margin-bottom: 3rem !important;">
+		<div class="container-fluid">
+			
+			<a class="navbar-brand" href='/'>
+				<img alt="Movie Engine Logo" class="embed-responsive" style="width: 6rem" src="{% static 'img/logo_white.svg' %}">
+			</a>
+				
+			<ul class="navbar-nav ml-auto">
+			
+				<li class="nav-item">
+					<a class="border-0 btn btn-secondary text-white py-2" style="border-radius: .8rem; font-size: 14px; font-weight: 600; padding-left: 18px; padding-right: 18px;" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=jesse.bouman%40gmail.com&currency_code=USD&source=url">Donate</a>
+				</li>
+				
+			</ul>
+
+		</div>
+	</nav>
+</div>
+
+<!-- Desktop navbar -->
+<div class="d-none d-md-block">
+	<nav class="bg-transparent navbar navbar-expand-lg mx-auto" style="margin-bottom: 5rem !important; padding-right: 10%; padding-left: 10%;">
+		<div class="container-fluid">
+			
+			<a class="navbar-brand" href='/'>
+				<img alt="Movie Engine Logo" class="embed-responsive" style="width: 6rem" src="{% static 'img/logo_white.svg' %}">
+			</a>
+				
+			<ul class="navbar-nav ml-auto">
+			
+				<li class="nav-item">
+					<a class="border-0 btn btn-secondary text-white py-2" style="border-radius: .8rem; font-size: 14px; font-weight: 600; padding-left: 18px; padding-right: 18px;" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=jesse.bouman%40gmail.com&currency_code=USD&source=url">Donate</a>
+				</li>
+				
+			</ul>
+
+		</div>
+	</nav>
+</div>

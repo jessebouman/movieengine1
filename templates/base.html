@@ -32,19 +32,10 @@ Please visit https://www.spencerfd.me for my contact information, portfolio, and
 
 	{% include '_partials/navbar.html' %}
 	
-	<div class="container-fluid px-4">
+	<div class="container-fluid">
 		{% block content %} {% endblock %}
 		
-		<!-- Twitter button -->
-		<div class="bg-transparent navbar mb-2" style="bottom: 0; left: 0; right: 0; padding-right: 0px">
-			<ul class="navbar-nav ml-auto">
-				<li class="nav-item">
-					<a href="https://www.twitter.com/jessebouman">
-						<img alt="Twitter" src="{% static 'img/twitter.svg' %}">
-					</a>
-				</li>
-			</ul>
-		</div>
+		{% include '_partials/twitter_button.html' %}
 	</div>
 	
   

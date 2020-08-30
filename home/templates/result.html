@@ -6,55 +6,69 @@
 <!-- background reel image -->
 <img alt="background photo reel" src="{% static 'img/reel.svg' %}" style="position: fixed; bottom: 0; right: 0; z-index: -1;opacity: .2;" />
 
-<!-- result/no result header block -->
-{% if media_list %}
-	<h1 class="text-center text-light mb-5 mt-5" style="font-size: 20px">Yes! They did work together!</h1>
-{% else %}
-	<div class="text-center my-5">
-		<h1>Oh no! No results.</h1>
-		<h1>¯\_(ツ)_/¯</h1>
-		<p class="text-light mt-4" style="font-size: 14px; font-weight: 500">Looks like these two actors haven't acted together</p>
-	</div>
-{% endif %}
+<div class="row justify-content-center">
+	<!-- Extra padding for large devices -->
+	<div class="col-3 d-none d-md-block"></div>
 
-<!-- Actor image/names block -->
-<div class="row justify-content-around mb-5">
-	{% for actor in actors %}
-		
-		<div class="col-4">
-			<div class="row justify-content-center">
-				<img class="rounded-circle mb-2" style="background-color: #f4f0f0; width:6rem; height:6rem; object-fit:cover; padding:4px" alt="actor profile photo" src="{% if actor.img %}{{ actor.img }}{% else %}{% static 'img/actor_default.jpg' %}{% endif %}" />
+	<div class="col">	
+		<!-- result/no result header block -->
+		{% if media_list %}
+			<h1 class="text-center text-light mb-5 mt-5" style="font-size: 20px">Yes! They did work together!</h1>
+		{% else %}
+			<div class="text-center my-5">
+				<h1>Oh no! No results.</h1>
+				<h1>¯\_(ツ)_/¯</h1>
+				<p class="text-light mt-4" style="font-size: 14px; font-weight: 500">Looks like these two actors haven't acted together</p>
 			</div>
-			<div class="row justify-content-center">
-				<span class="text-light text-center">{{ actor.name }}</span>
-			</div>
-		</div>
-		
-	{% endfor %}
-</div>
+		{% endif %}
 
-<!-- Movie list block -->
-{% if media_list %}
-	<div class="row justify-content-center mx-2 mb-3">
-		<ul class="list-unstyled text-light">
-		{% for media in media_list %}
-			<li class="row mb-4">
-				<div class="col-1"><img alt="tag" class="" src="{% static 'img/tag.svg' %}" /></div>
-				<div class="col" style="font-size: 14px; font-weight: 500;">
-					<a target="blank" href="{% if media.link %}https://www.imdb.com/title/{{ media.link }}/{% else %}#{% endif %}">
-						{{ media.title }} »
-					</a> 
-					({{ media.year }}) as {{ media.characters.0 }}{% if media.episodes.0 %} ({{ media.episodes.0 }} episodes){% endif %} and {{ media.characters.1 }}{% if media.episodes.1 %} ({{ media.episodes.1 }} episodes){% endif %}
+		<!-- Actor image/names block -->
+		<div class="row justify-content-around mb-5">
+			{% for actor in actors %}
+				
+				<div class="col-4">
+					<div class="row justify-content-center">
+						<img class="rounded-circle mb-2" style="background-color: #f4f0f0; width:6rem; height:6rem; object-fit:cover; padding:4px" alt="actor profile photo" src="{% if actor.img %}{{ actor.img }}{% else %}{% static 'img/actor_default.jpg' %}{% endif %}" />
+					</div>
+					<div class="row justify-content-center">
+						<span class="text-light text-center">{{ actor.name }}</span>
+					</div>
 				</div>
-			</li>
-		{% endfor %}
-		</ul>
-	</div>
-{% endif %}
+				
+			{% endfor %}
+		</div>
 
-<!-- Search another duo button -->
-<div class="row mb-3">
-	<a class="btn btn-block btn-warning text-dark mx-3" style="font-weight: 600; font-size: 14px;" href="/">Search another duo</a>
+		<!-- Movie list block -->
+		{% if media_list %}
+			<div class="row mx-2 mb-3">
+				<ul class="list-unstyled text-light">
+				{% for media in media_list %}
+					<li class="row mb-4">
+						<div class="col-1"><img alt="tag" class="" src="{% static 'img/tag.svg' %}" /></div>
+						<div class="col" style="font-size: 14px; font-weight: 500;">
+							<a target="blank" href="{% if media.link %}https://www.imdb.com/title/{{ media.link }}/{% else %}#{% endif %}">
+								{{ media.title }} »
+							</a> 
+							({{ media.year }}) as {{ media.characters.0 }}{% if media.episodes.0 %} ({{ media.episodes.0 }} episodes){% endif %} and {{ media.characters.1 }}{% if media.episodes.1 %} ({{ media.episodes.1 }} episodes){% endif %}
+						</div>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
+		{% endif %}
+
+		<!-- Search another duo button (mobile) -->
+		<div class="d-md-none row">
+			<a class="btn btn-block btn-warning text-dark mx-4 mb-2" style="font-weight: 600; font-size: 14px;" href="/">Search another duo</a>
+		</div>
+		<!-- Search another duo button (desktop) -->
+		<div class="d-none d-md-block row" style="margin-left: 7rem; margin-right: 7rem;">
+			<a class="btn btn-block btn-warning text-dark mx-4 mb-2" style="font-weight: 600; font-size: 14px;" href="/">Search another duo</a>
+		</div>
+	</div>
+	
+	<!-- Extra padding for large devices -->
+	<div class="col-3 d-none d-md-block"></div>
 </div>
 
 {% endblock %}
