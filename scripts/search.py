@@ -8,7 +8,11 @@ Script to handle actor search
 """
 import os
 import requests
+import aiohttp
+import asyncio
+
 from fuzzywuzzy import fuzz
+from aiohttp import ClientSession
 
 IMDB_KEY = os.environ.get('IMDB_KEY')
 
@@ -23,7 +27,7 @@ def handle_search(*actors):
     -------
     movies : list, None
         A list of dictionaries with the details of movie credits shared by the two actors
-        None if one of the actors couldn't be found
+        None if one of the actors couldn't be found or they actors have no movies in common
     actor_details : list
         A list of dictionaries with the actor details
     """
@@ -44,40 +48,65 @@ def handle_search(*actors):
         return None, actor_details
 
     # Find any matches between the sets of movies
-    actor_movie_sets = [set(list(movie_ids)) for movie_ids in actor_credits]
+    actor_movie_sets = [set(list(ids['movies'])) for ids in actor_credits]
     shared_movies = set.intersection(*actor_movie_sets)
 
-    # If there are no shared movies, return None and actor details
-    if not shared_movies:
+    # Find any matches between the sets of TV shows
+    actor_tv_sets = [set(list(ids['tv'])) for ids in  actor_credits]
+    shared_tv = set.intersection(*actor_tv_sets)
+
+    # If there are no shared movies and no shared TV shows, return None and actor details
+    if not shared_movies and not shared_tv:
         return None, actor_details
 
-    # Build result list
-    movies = [{
-            'title': actor_credits[0][m_id]['title'],
-            'year': actor_credits[0][m_id]['year'],
-            'characters': [a[m_id]['character'] for a in actor_credits],
-            'link': get_movie_link(m_id),
-            } for m_id in shared_movies]
-    movies = sorted(movies, key = lambda m : m['year'], reverse=True) # sort by oldest -> newest
+    if shared_movies:
+        # Async IMDB ID retrieval
+        movie_links = dict(asyncio.run(get_links(shared_movies, media_type='movie')))
 
-    return movies, actor_details
+        # Build movie list
+        movies = [{
+                    'title': actor_credits[0]['movies'][m_id]['title'],
+                    'year': actor_credits[0]['movies'][m_id]['year'],
+                    'characters': [a['movies'][m_id]['character'] for a in actor_credits],
+                    'link': movie_links[m_id]
+                } for m_id in shared_movies]
+    else:
+        movies = []
+
+    if shared_tv:
+        # Async IMDB ID retrieval
+        tv_links = dict(asyncio.run(get_links(shared_tv, media_type='tv')))
+
+        tv_shows = [{
+                    'title': actor_credits[0]['tv'][m_id]['title'],
+                    'year': actor_credits[0]['tv'][m_id]['year'],
+                    'characters': [a['tv'][m_id]['character'] for a in actor_credits],
+                    'episodes': [a['tv'][m_id]['episodes'] for a in actor_credits],
+                    'link': tv_links[m_id]
+                } for m_id in shared_tv]
+    else:
+        tv_shows = []
+
+    media = movies + tv_shows
+    media = sorted(media, key = lambda m : m['year'], reverse=True) # sort by newest -> oldest
+
+    return media, actor_details
 
 def get_actor_details(actor):
     """
     Returns the ID, name, and profile picture of the requested actor.
     If multiple actors with the same name exist, choose the most popular actor
-    If no actor exists, return None
 
     Parameters
     ----------
     actor : str
-        An actor's name
+        An search query for an actor's name
 
     Returns
     -------
     details : dict, None
         The IMDB API ID, name, and photo of the actor
-        None if the actor does not exist in the IMDB API
+        Defaults to returns None as the id and actor as the name if the search query yields no result
     """
 
     # Default result
@@ -124,7 +153,7 @@ def get_actor_details(actor):
 
 def get_actor_credits(actor_id):
     """
-    Finds a list of movies the requested actor has acted in
+    Finds a list of movies and TV shows the requested actor has acted in
 
     Parameters
     ----------
@@ -133,9 +162,9 @@ def get_actor_credits(actor_id):
 
     Returns
     -------
-    movies : list, None
-        A list of dictionaries with the details of each movie the actor acted in
-        None if the actor has no movies listed
+    movies, tv : dict, None
+        A list of dictionaries with the details of each movie/show the actor acted in
+        None if the actor has no movies/shows listed
     """
 
     # Return None if the actor could not be found
@@ -143,7 +172,7 @@ def get_actor_credits(actor_id):
         return None
 
     # Construct and execute API query
-    url = f'https://api.themoviedb.org/3/person/{actor_id}/movie_credits'
+    url = f'https://api.themoviedb.org/3/person/{actor_id}/combined_credits'
     response = requests.get(url, params={'api_key': IMDB_KEY})
 
     # Convert to dictionary
@@ -158,7 +187,7 @@ def get_actor_credits(actor_id):
     else:
         data = data['cast']
 
-    # Filter out "Making of" entries
+    # Filter out "Making of" entries for movies
     def character_filter(character):
         if not character:
             return False
@@ -171,48 +200,69 @@ def get_actor_credits(actor_id):
 
     data = list(filter(lambda d : character_filter(d['character']), data))
 
-    # Build result list
+    # Build movie result list
+    movie_data = list(filter(lambda d : d['media_type'] == 'movie', data))
     movies = {
             movie.get('id'): {
                     'title': movie.get('title'),
                     'year': movie.get('release_date', 'n.d.')[:4],
                     'character': movie.get('character', '')
-                    } for movie in data
+                    } for movie in movie_data
             }
 
-    return movies
+    # Build TV result list
+    tv_data = list(filter(lambda d : d['media_type'] == 'tv', data))
+    tv_shows = {}
+    for tv in tv_data: # prevent secondary characters from listing
+        tv_shows.setdefault(tv.get('id'),
+                            {
+                                    'title': tv.get('name'),
+                                    'year': tv.get('first_air_date', 'n.d.')[:4],
+                                    'character': tv.get('character', ''),
+                                    'episodes': tv.get('episode_count', 0)
+                            })
 
-def get_movie_link(movie_id):
+    return {'movies': movies, 'tv': tv_shows}
+
+async def get_links(media, media_type):
     """
-    Returns the IMDB page link for the requested movie.
+    Wrapper for async IMDB link retrieval
+    """
+    async with ClientSession() as session:
+        res = await asyncio.gather(*[get_imdb_link(tmdb_id, media_type, session) for tmdb_id in media])
+        return res
+
+async def get_imdb_link(tmbd_id, media_type, session):
+    """
+    Returns the IMDB page link for the requested movie/show.
 
     Parameters
     ----------
     movie_id : int
-        A TMDB movie ID
+        A TMDB movie/TV ID
 
     Returns
     -------
     link : str
-        The IMDB page url of the requested movie
-        Empty string if the movie does not have an IMDB page
+        The IMDB page url of the requested movie/show
+        Empty string if the movie/show does not have an IMDB page
     """
 
     # Sanity check - make sure an int is passed
-    if not isinstance(movie_id, int):
-        return ''
+    if not isinstance(tmbd_id, int):
+        return tmbd_id, ''
 
     # Construct and execute API query
-    url = f'https://api.themoviedb.org/3/movie/{movie_id}'
-    response = requests.get(url, params={'api_key': IMDB_KEY})
+    url = f'https://api.themoviedb.org/3/{media_type}/{tmbd_id}/external_ids?api_key={IMDB_KEY}'
+    response = await session.request(method='GET', url=url)
 
     # Convert to dictionary
     try:
-        data = response.json()
+        data = await response.json()
     except:
-        return '' # Invalid IMDB response
+        return tmbd_id, '' # Invalid IMDB response
 
-    return data.get('imdb_id', '')
+    return tmbd_id, data.get('imdb_id', '')
 
 def match_name(actor, entry):
     """

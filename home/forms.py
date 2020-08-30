@@ -7,7 +7,7 @@ class ActorSearch(forms.Form):
             widget=forms.TextInput(
                     attrs={
                             'class': 'form-control pl-3',
-                            'style': 'padding-bottom: 24px; padding-top: 32px'
+                            'style': 'padding-bottom: 24px; padding-top: 36px'
                             }
                     ),
             max_length=100,
@@ -19,7 +19,7 @@ class ActorSearch(forms.Form):
             widget=forms.TextInput(
                     attrs={
                             'class': 'form-control pl-3',
-                            'style': 'padding-bottom: 24px; padding-top: 32px'
+                            'style': 'padding-bottom: 24px; padding-top: 36px'
                             }
                     ),
             max_length=100,

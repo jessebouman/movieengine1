@@ -37,10 +37,10 @@ def result(request, **actors):
         A dictionary of actors to lookup
     """
 
-    result = handle_search(actors['first_actor'], actors['second_actor'])
+    result = handle_search(*list(actors.values()))
 
     context = {
             'actors': result[1],
-            'movies': result[0]
+            'media_list': result[0]
             }
     return render(request, 'result.html', context)

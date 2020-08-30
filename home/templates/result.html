@@ -7,7 +7,7 @@
 <img alt="background photo reel" src="{% static 'img/reel.svg' %}" style="position: fixed; bottom: 0; right: 0; z-index: -1;opacity: .2;" />
 
 <!-- result/no result header block -->
-{% if movies %}
+{% if media_list %}
 	<h1 class="text-center text-light mb-5 mt-5" style="font-size: 20px">Yes! They did work together!</h1>
 {% else %}
 	<div class="text-center my-5">
@@ -34,17 +34,17 @@
 </div>
 
 <!-- Movie list block -->
-{% if movies %}
+{% if media_list %}
 	<div class="row justify-content-center mx-2 mb-3">
 		<ul class="list-unstyled text-light">
-		{% for movie in movies %}
+		{% for media in media_list %}
 			<li class="row mb-4">
 				<div class="col-1"><img alt="tag" class="" src="{% static 'img/tag.svg' %}" /></div>
 				<div class="col" style="font-size: 14px; font-weight: 500;">
-					<a target="blank" href="{% if movie.link %}https://www.imdb.com/title/{{ movie.link }}/{% else %}#{% endif %}">
-						{{ movie.title }} »
+					<a target="blank" href="{% if media.link %}https://www.imdb.com/title/{{ media.link }}/{% else %}#{% endif %}">
+						{{ media.title }} »
 					</a> 
-					({{ movie.year }}) as {{ movie.characters.0 }} and {{ movie.characters.1 }}
+					({{ media.year }}) as {{ media.characters.0 }}{% if media.episodes.0 %} ({{ media.episodes.0 }} episodes){% endif %} and {{ media.characters.1 }}{% if media.episodes.1 %} ({{ media.episodes.1 }} episodes){% endif %}
 				</div>
 			</li>
 		{% endfor %}
