@@ -42,8 +42,7 @@
 				<div class="col-1"><img alt="tag" class="" src="{% static 'img/tag.svg' %}" /></div>
 				<div class="col" style="font-size: 14px; font-weight: 500;">
 					<a target="blank" href="{% if movie.link %}https://www.imdb.com/title/{{ movie.link }}/{% else %}#{% endif %}">
-						{{ movie.title }}
-						<i class="fas fa-angle-double-right text-white" style="width:.8rem; height:.8rem;padding-bottom:.2rem"></i>
+						{{ movie.title }} »
 					</a> 
 					({{ movie.year }}) as {{ movie.characters.0 }} and {{ movie.characters.1 }}
 				</div>

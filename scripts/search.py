@@ -117,8 +117,9 @@ def get_actor_details(actor):
         return details # No actors in result list
 
     # Sort by popularity and choose the most popular actor
+    exact_match = list(filter(lambda d : d['name'].lower() == actor.lower(), data))
     data = sorted(data, key = lambda a : a['popularity'], reverse=True)
-    entry = data[0]
+    entry = exact_match[0] if exact_match else data[0] # give preference to exact name match
     details = {
             'id': entry['id'],
             'name': entry['name'],
