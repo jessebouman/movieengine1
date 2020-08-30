@@ -131,18 +131,27 @@ def get_actor_details(actor):
     if not data['results']:
         return details
     else:
-        data = data['results']
+        # Fetch multiple pages and append if multiple pages exist in results
+        if data.get('total_pages', 1) > 1:
+            extra_data = asyncio.run(fetch_more_pages(actor, data.get('total_pages')))
+            data = data['results']
+            for d in extra_data:
+                data.extend(d)
+        else:
+            data = data['results']
 
     # Filter for actors loosely matching string query
-    data = list(filter(lambda d : d['known_for_department'] == 'Acting', data))
-    data = list(filter(lambda d : match_name(actor, d['name']) > 175, data))
+    data = list(filter(lambda d : d.get('known_for_department') == 'Acting', data))
+    data = list(filter(lambda d : match_name(actor, d.get('name', '')) > 175, data))
     if not data:
         return details # No actors in result list
 
     # Sort by popularity and choose the most popular actor
-    exact_match = list(filter(lambda d : d['name'].lower() == actor.lower(), data))
-    data = sorted(data, key = lambda a : a['popularity'], reverse=True)
-    entry = exact_match[0] if exact_match else data[0] # give preference to exact name match
+    exact_match = list(filter(lambda d : d.get('name', '').lower() == actor.lower(), data))
+    data = sorted(data, key = lambda a : a.get('popularity', 0), reverse=True)
+
+    # Give preference to exact name match if at least a first and last name is provided
+    entry = exact_match[0] if exact_match and len(actor.split()) > 1 else data[0]
     details = {
             'id': entry['id'],
             'name': entry['name'],
@@ -150,6 +159,33 @@ def get_actor_details(actor):
             }
 
     return details
+
+async def fetch_more_pages(query, pages):
+    """
+    Wrapper to return more search result pages
+    """
+    # Max ten page limit
+    if pages > 12:
+        pages = 12
+
+    async with ClientSession() as session:
+        res = await asyncio.gather(*[get_another_page(query, page, session) for page in range(2, pages)])
+        return res
+
+async def get_another_page(query, page, session):
+    """
+    Returns a page (> 1) from the specified search results
+    """
+
+    url = f'https://api.themoviedb.org/3/search/person?api_key={IMDB_KEY}&query={query}&page={page}&include_adult=false'
+    response = await session.request(method='GET', url=url)
+
+    try:
+        data = await response.json()
+    except:
+        return []
+
+    return data['results']
 
 def get_actor_credits(actor_id):
     """
@@ -198,10 +234,10 @@ def get_actor_credits(actor_id):
 
         return True
 
-    data = list(filter(lambda d : character_filter(d['character']), data))
+    data = list(filter(lambda d : character_filter(d.get('character', '')), data))
 
     # Build movie result list
-    movie_data = list(filter(lambda d : d['media_type'] == 'movie', data))
+    movie_data = list(filter(lambda d : d.get('media_type') == 'movie', data))
     movies = {
             movie.get('id'): {
                     'title': movie.get('title'),
@@ -211,7 +247,7 @@ def get_actor_credits(actor_id):
             }
 
     # Build TV result list
-    tv_data = list(filter(lambda d : d['media_type'] == 'tv', data))
+    tv_data = list(filter(lambda d : d.get('media_type') == 'tv', data))
     tv_shows = {}
     for tv in tv_data: # prevent secondary characters from listing
         tv_shows.setdefault(tv.get('id'),
