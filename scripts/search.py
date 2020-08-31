@@ -165,8 +165,8 @@ async def fetch_more_pages(query, pages):
     Wrapper to return more search result pages
     """
     # Max ten page limit
-    if pages > 12:
-        pages = 12
+    if pages > 11:
+        pages = 11
 
     async with ClientSession() as session:
         res = await asyncio.gather(*[get_another_page(query, page, session) for page in range(2, pages)])
