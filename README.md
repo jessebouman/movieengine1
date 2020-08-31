@@ -18,7 +18,7 @@ Note that the `result` path takes two string arguments: `first_actor` and `secon
 
 Contains two functions: `home()` and `result()`.
 `home()` displays and validates the actor search form, then passes the validated search query to the result function. 
-`result()` function takes the search query, performs the search, and displays the results.
+`result()` takes the search query, performs the search, and displays the results.
 
 ### [home/forms.py](https://github.com/sfergusond/imdb/blob/master/home/forms.py)
 
@@ -30,15 +30,21 @@ The main settings file for the project.
 
 ### [scripts/search.py](https://github.com/sfergusond/imdb/blob/master/scripts/search.py)
 
-Contains functions handling the actor search. All code in this file will take an arbitrary number of inputs. In other words, the result of the search would find any common media appearances between any number of actors. 
+Contains functions handling the actor search. All code in this file will take an arbitrary number of inputs. In other words, the result of the search would find any common media appearances between any number of actors.
+
 For the most part, the code is not asynchronous. A minimum of 5 API requests are made for a successful result, with each query result generally depending on the prior query, so asynchronous code wouldn't give much performance benefit. 
+
 It's well-dcoumented so use `help(search)` to display the docstring.
 
-The wrapper funciton, `handle_search()` does very little work on its own, and instead calls other sub-functions:
-1. For each search term, find the "best" result in the TMBD database (and return their `name`, `photo`, and `id`). "Best" is defined as either an exact name match or if no exact matches exist, then the most popular of the search results. If more than one page of search results are returned, then the code will asynchronously fetch at most 10 further pages. Search results beyond 10 pages tend to have little relevance to the original query and created an unneccessary bottleneck. Furthermore, actors whose first letters of their first and last names do not match the first letters of each word in the search query will be discarded. A loose string match is performed on the rest to filter out more actors whose names don't match well to the search query.
+The wrapper function, `handle_search()` does very little work on its own, and instead calls other sub-functions:
+1. For each search term, find the "best" result in the TMBD database (and return their `name`, `photo`, and `id`). 
+  - "Best" is defined as either an exact name match, or if no exact matches exist, then the most popular of the search results. 
+  - If more than one page of search results are returned, the code will asynchronously fetch at most 10 further pages. Search results beyond 10 pages tend to have little relevance to the original query and creates an unneccessary bottleneck. 
+  - Furthermore, actors whose first letters of their first and last names do not match the first letters of each word in the search query will be discarded.
+    - For example, if the search query is `anne h`, then `Maryanne Smith` and `Anne Poole` are filtered out, but `Anne Hathaway` and `Arthur Hall` remain. Similarly, if the search query is `anne`, then `Maryanne Smith` is filtered out, but `Anne Hathaway` and `Bill Ansley` remain. A loose string match is performed on the rest to filter out more actors whose names don't match well to the search query.
 2. For each actor, retrieve a list of their movie and TV credits. Note that TMBD will list credits for non-acting roles, which is why `cast` is checked as a dictionary key in the API query results.
 3. At this point if either of the sub-functions failed to return a result or the TMBD API search somehow found the exact same actor for both search terms, the function exits, returning `None` for the shared media list and whatever `actor_details` were found
-3. Find then intersection between the actors' sets of move and TV credits. These processes are performed separately for two reasons. First, TV and movie ids are unique only to their respective media type. Second, different API endpoints are used to get further details for movies and TV shows.
+3. Find the intersection between the actors' sets of move and TV credits. These processes are performed separately for two reasons. First, TV and movie ids are unique only to their respective media type. Second, different API endpoints are used to get further details for movies and TV shows.
 4. If there are shared movies or TV shows, then run an asynchronous query to grab the IMDB id of each shared medium (used to build the exeternal link). Finally, build a list of dictionaries with the `title`, `year`, `characters played`, `episode_count`, and `link` of each shared medium.
 5. Sort the result by newest to oldest and return
 
@@ -48,29 +54,39 @@ Frontend files are contained in three locations:
 
 ### [templates/](https://github.com/sfergusond/imdb/tree/master/templates)
 
-Contains the [`base.html`](https://github.com/sfergusond/imdb/blob/master/templates/base.html) file that all other html files inherit. The file contains the `<head>` and `<body>` sections, javascript imports, the navbar, and the Twitter link. [`404.html`](https://github.com/sfergusond/imdb/blob/master/templates/404.html) and [`500.html`](https://github.com/sfergusond/imdb/blob/master/templates/500.html) are the templates served for the corresponding server errors.
+Contains the [`base.html`](https://github.com/sfergusond/imdb/blob/master/templates/base.html) file that all other html files inherit. The file contains the `<head>` and `<body>` sections, javascript imports, the navbar, and the Twitter link.
+
+[`404.html`](https://github.com/sfergusond/imdb/blob/master/templates/404.html) and [`500.html`](https://github.com/sfergusond/imdb/blob/master/templates/500.html) are the templates served for the corresponding server errors.
+
 The navbar and Twitter link html files are contained within the [`_partials/`](https://github.com/sfergusond/imdb/tree/master/templates/_partials) sub-directory. Note that each file contains a desktop and mobile version.
 
 ### [home/templates/](https://github.com/sfergusond/imdb/tree/master/home/templates)
 
 Contains two files: [`home.html`](https://github.com/sfergusond/imdb/blob/master/home/templates/home.html) and [`result.html`](https://github.com/sfergusond/imdb/blob/master/home/templates/result.html). The former is the template served for the home page, while the latter is served for the results page. 
+
 Depending on the data returned by `result()` in [`home/views.py`](https://github.com/sfergusond/imdb/blob/master/home/views.py), the results page will either display the "No Results" or "Yes! They worked together" screens. The variable `media_list` is None if the search was unsuccessful for any reason, but otherwise contains a list of dictionaries representing each shared movie/TV show. Each dictionary contains the `title`, `year`, `character` list (in order of the search query), and `episode` list (if it's a TV show). The variable `actors` contains a list of acotrs returned by the search query. Each actor has a `name` and `photo`.
 
 ### [imdb/static/](https://github.com/sfergusond/imdb/tree/master/imdb/static)
 
 Contains the CSS and static media files for the project. Within [`imdb/static/css`](https://github.com/sfergusond/imdb/tree/master/imdb/static/css) is [`bootstrap.css`](https://github.com/sfergusond/imdb/blob/master/imdb/static/css/bootstrap.css), which is the main CSS file. It's based on Bootstrap 4, but I removed significant portions of the file that were unused (i.e alerts, badges, tables, etc). 
+
 Within [`imdb/static/img`](https://github.com/sfergusond/imdb/tree/master/imdb/static/img) are the logos and images used throughout the project.
 
 ## Deployment
 
 Navigate to the "Deploy" tab on [Heroku](https://dashboard.heroku.com/apps/imdbactorsearch/deploy/github) and connect to this (or your own) GitHub repo. Just make sure [`DEBUG_MODE`](https://github.com/sfergusond/imdb/blob/master/imdb/settings.py#L27) is set to `False` in `imdb/settings.py` and no secret keys are hardcoded anywhere in the files. 
+
 If any additional libraries are installed, they must be added in [`requirements.txt`](https://github.com/sfergusond/imdb/blob/master/requirements.txt) before deployment on Heroku. 
+
 While developing locally, you may run `python manage.py collectstatic` which will created a new static folder at the root directory. Making changes to these collected static files (.css, .js, .svg, etc) will show up locally, but _will not_ be preserved after deployment. All static file changes must be made in the [`imdb/static/`](https://github.com/sfergusond/imdb/tree/master/imdb/static) directory.
 
 ## Secret keys
 
 Secret keys are stored on Heroku. Navigate to [Settings](https://dashboard.heroku.com/apps/imdbactorsearch/settings), then click "Reveal Config Vars" (You can also add new environment variables here). 
-`SECRET_KEY` is the Django production key. Without it, Django will be unable to run any `python manage.py` commands. `IMDB_KEY` is actually the key for the TMDB API, use this for any API calls. It's imported from the environment as a global variable in [`search.py`](https://github.com/sfergusond/imdb/blob/master/scripts/search.py).
+
+`SECRET_KEY` is the Django production key. Without it, Django will be unable to run any `python manage.py` commands.
+
+`IMDB_KEY` is actually the key for the TMDB API, use this for any API calls. It's imported from the environment as a global variable in [`search.py`](https://github.com/sfergusond/imdb/blob/master/scripts/search.py).
 
 ## API Integrations
 
