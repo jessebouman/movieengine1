@@ -12,7 +12,7 @@ Within the [`home/`](https://github.com/sfergusond/imdb/tree/master/home) direct
 
 Maps url patterns to functions in the [`views.py`](https://github.com/sfergusond/imdb/blob/master/home/views.py) file. 
 
-Note that the result path takes two string arguments: `first_actor` and `second_actor`.
+Note that the `result` path takes two string arguments: `first_actor` and `second_actor`.
 
 ### [home/views.py](https://github.com/sfergusond/imdb/blob/master/home/views.py)
 
