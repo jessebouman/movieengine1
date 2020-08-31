@@ -48,7 +48,9 @@
 						<div class="col" style="font-size: 14px; font-weight: 500;">
 							<a target="blank" href="{% if media.link %}https://www.imdb.com/title/{{ media.link }}/{% else %}#{% endif %}">
 								{{ media.title }} »
-							</a> 
+							</a>
+							
+							<!-- Description block: currently hard-coded, but can be replaced with a for loop to contain more actors -->
 							({{ media.year }}) as {{ media.characters.0 }}{% if media.episodes.0 %} ({{ media.episodes.0 }} episodes){% endif %} and {{ media.characters.1 }}{% if media.episodes.1 %} ({{ media.episodes.1 }} episodes){% endif %}
 						</div>
 					</li>
